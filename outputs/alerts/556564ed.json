@@ -1,0 +1,11 @@
+{
+  "alert_id": "556564ed",
+  "level": "HIGH",
+  "crisis_probability": 0.5561,
+  "bert_score": 0.9945,
+  "lstm_score": 0.5,
+  "lda_score": 0.1458,
+  "trigger_text": "it s pandemonium in nola",
+  "timestamp": "2026-04-21T18:05:37.393128+00:00",
+  "top_tweets": []
+}

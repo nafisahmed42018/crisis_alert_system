@@ -25,7 +25,8 @@ class CrisisAlert:
     lstm_score:        float
     lda_score:         float
     trigger_text:      str
-    timestamp:         str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    timestamp:         str = field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat())
     top_tweets:        List[str] = field(default_factory=list)
 
     def to_dict(self) -> dict:

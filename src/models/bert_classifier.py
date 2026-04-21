@@ -31,8 +31,8 @@ from transformers import (
     EarlyStoppingCallback,
 )
 
-MODEL_NAME  = "distilbert-base-uncased"
-MAX_LENGTH  = 128
+MODEL_NAME = "distilbert-base-uncased"
+MAX_LENGTH = 128
 RANDOM_SEED = 42
 
 
@@ -69,8 +69,8 @@ class BERTClassifier:
     def __init__(self, model_name: str = MODEL_NAME, max_length: int = MAX_LENGTH):
         self.model_name = model_name
         self.max_length = max_length
-        self.tokenizer  = None
-        self.model      = None
+        self.tokenizer = None
+        self.model = None
 
     # ------------------------------------------------------------------
     # Training
@@ -82,13 +82,13 @@ class BERTClassifier:
         text_col:  str = "text_clean",
         label_col: str = "label",
         test_size: float = 0.15,
-        epochs:    int   = 3,
-        batch_size:int   = 16,
-        output_dir:str   = "outputs/models/bert_v1",
+        epochs:    int = 3,
+        batch_size: int = 16,
+        output_dir: str = "outputs/models/bert_v1",
     ) -> dict:
         df = pd.read_csv(data_path)
         df = df.dropna(subset=[text_col, label_col])
-        texts  = df[text_col].tolist()
+        texts = df[text_col].tolist()
         labels = df[label_col].astype(int).tolist()
 
         X_train, X_val, y_train, y_val = train_test_split(
@@ -98,7 +98,7 @@ class BERTClassifier:
         print(f"Train: {len(X_train)} | Val: {len(X_val)}")
 
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
-        self.model     = AutoModelForSequenceClassification.from_pretrained(
+        self.model = AutoModelForSequenceClassification.from_pretrained(
             self.model_name, num_labels=2
         )
 
@@ -108,8 +108,10 @@ class BERTClassifier:
             len(labels) / (2.0 * class_counts), dtype=torch.float
         )
 
-        train_ds = TweetDataset(X_train, y_train, self.tokenizer, self.max_length)
-        val_ds   = TweetDataset(X_val,   y_val,   self.tokenizer, self.max_length)
+        train_ds = TweetDataset(
+            X_train, y_train, self.tokenizer, self.max_length)
+        val_ds = TweetDataset(
+            X_val,   y_val,   self.tokenizer, self.max_length)
 
         args = TrainingArguments(
             output_dir=output_dir,
@@ -141,7 +143,8 @@ class BERTClassifier:
         # Final evaluation
         preds = self.predict([t for t in X_val])
         pred_labels = (np.array(preds) >= 0.5).astype(int)
-        print("\n" + classification_report(y_val, pred_labels, target_names=["Normal","Crisis"]))
+        print("\n" + classification_report(y_val,
+              pred_labels, target_names=["Normal", "Crisis"]))
 
         self.save(output_dir)
         return {"val_size": len(X_val), "model_dir": output_dir}
@@ -157,7 +160,7 @@ class BERTClassifier:
         scores = []
 
         for i in range(0, len(texts), batch_size):
-            batch = texts[i : i + batch_size]
+            batch = texts[i: i + batch_size]
             enc = self.tokenizer(
                 batch,
                 truncation=True,
@@ -186,7 +189,7 @@ class BERTClassifier:
     def load(cls, path: str) -> "BERTClassifier":
         obj = cls()
         obj.tokenizer = AutoTokenizer.from_pretrained(path)
-        obj.model     = AutoModelForSequenceClassification.from_pretrained(path)
+        obj.model = AutoModelForSequenceClassification.from_pretrained(path)
         obj.model.eval()
         return obj
 
@@ -203,8 +206,9 @@ class _WeightedTrainer(Trainer):
     def compute_loss(self, model, inputs, return_outputs=False, **kwargs):
         labels = inputs.pop("labels")
         outputs = model(**inputs)
-        logits  = outputs.logits
-        weights = self._class_weights.to(logits.device) if self._class_weights is not None else None
+        logits = outputs.logits
+        weights = self._class_weights.to(
+            logits.device) if self._class_weights is not None else None
         loss = torch.nn.CrossEntropyLoss(weight=weights)(logits, labels)
         return (loss, outputs) if return_outputs else loss
 

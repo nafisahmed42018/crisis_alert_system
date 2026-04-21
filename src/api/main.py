@@ -5,26 +5,24 @@ Run from project root:
 """
 
 from __future__ import annotations
+from src.api.x_client import search_recent, RawTweet
+from src.api.ai_recommendation import build_recommendation_ai
+from src.alerts.alert_engine import AlertEngine
+from src.models.ensemble import CrisisEnsemble
+from pydantic import BaseModel
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI, HTTPException, Query
+from typing import List, Optional
+from datetime import datetime, timezone
+import uuid
+import time
+import asyncio
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(ROOT))
 
-import asyncio
-import time
-import uuid
-from datetime import datetime, timezone
-from typing import List, Optional
-
-from fastapi import FastAPI, HTTPException, Query
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-
-from src.models.ensemble      import CrisisEnsemble
-from src.alerts.alert_engine  import AlertEngine
-from src.api.recommendation   import build_recommendation, Recommendation
-from src.api.x_client         import search_recent, RawTweet
 
 # ---------------------------------------------------------------------------
 # App setup
@@ -47,12 +45,13 @@ app.add_middleware(
 _ensemble: Optional[CrisisEnsemble] = None
 _alert_engine = AlertEngine(min_level="LOW")
 
+
 def get_ensemble() -> CrisisEnsemble:
     global _ensemble
     if _ensemble is None:
         _ensemble = CrisisEnsemble.load(
             bert_path=str(ROOT / "outputs/models/bert_v1"),
-            lda_path =str(ROOT / "outputs/models/lda_v1"),
+            lda_path=str(ROOT / "outputs/models/lda_v1"),
             lstm_path=str(ROOT / "outputs/models/lstm_v1"),
         )
     return _ensemble
@@ -79,6 +78,7 @@ def _store_alert(record: dict) -> None:
 class AnalyzeRequest(BaseModel):
     text: str
     demo_mode: bool = True
+
 
 class FetchRequest(BaseModel):
     keywords:       List[str]
@@ -118,19 +118,32 @@ class FetchResponse(BaseModel):
 # Helpers
 # ---------------------------------------------------------------------------
 
-def _score_texts(texts: list[str], demo_mode: bool, sources: list[dict] | None = None) -> list[ScoreResult]:
+async def _score_texts(
+    texts: list[str],
+    demo_mode: bool,
+    sources: list[dict] | None = None,
+    search_keywords: list[str] | None = None,
+) -> list[ScoreResult]:
     ensemble = get_ensemble()
     df = ensemble.predict_df(texts, demo_mode=demo_mode)
 
-    results: list[ScoreResult] = []
-    for i, row in df.iterrows():
-        rec = build_recommendation(
+    # Fan out AI recommendation calls in parallel for all rows
+    rows = list(df.iterrows())
+    recs = await asyncio.gather(*[
+        build_recommendation_ai(
             text=row["text"],
             alert_level=row["alert_level"],
             bert_score=float(row["bert_score"]),
             lstm_score=float(row["lstm_score"]),
             lda_score=float(row["lda_score"]),
+            crisis_probability=float(row["crisis_probability"]),
+            search_keywords=search_keywords,
         )
+        for _, row in rows
+    ])
+
+    results: list[ScoreResult] = []
+    for (i, row), rec in zip(rows, recs):
         src = sources[i] if sources else {}
         record = ScoreResult(
             id=src.get("id", str(uuid.uuid4())),
@@ -168,16 +181,16 @@ def health():
 
 
 @app.post("/api/analyze", response_model=ScoreResult)
-def analyze(req: AnalyzeRequest):
+async def analyze(req: AnalyzeRequest):
     """Score a single tweet text through the ensemble."""
     if not req.text.strip():
         raise HTTPException(status_code=400, detail="text must not be empty")
-    results = _score_texts([req.text.strip()], demo_mode=req.demo_mode)
+    results = await _score_texts([req.text.strip()], demo_mode=req.demo_mode)
     return results[0]
 
 
 @app.post("/api/fetch-and-analyze", response_model=FetchResponse)
-def fetch_and_analyze(req: FetchRequest):
+async def fetch_and_analyze(req: FetchRequest):
     """Fetch recent tweets from X API matching keywords, then score them."""
     raw_tweets: list[RawTweet] = search_recent(
         keywords=req.keywords,
@@ -187,7 +200,7 @@ def fetch_and_analyze(req: FetchRequest):
     x_api_live = len(raw_tweets) > 0
 
     if raw_tweets:
-        texts   = [t.text for t in raw_tweets]
+        texts = [t.text for t in raw_tweets]
         sources = [
             {
                 "id": t.id,
@@ -199,10 +212,11 @@ def fetch_and_analyze(req: FetchRequest):
         ]
     else:
         # Fallback: synthesize demo tweets from keywords
-        texts   = [f"Breaking: {kw} situation reported — emergency teams responding" for kw in req.keywords[:5]]
+        texts = [
+            f"Breaking: {kw} situation reported — emergency teams responding" for kw in req.keywords[:5]]
         sources = [{"id": str(uuid.uuid4()), "source": "demo"} for _ in texts]
 
-    results = _score_texts(texts, demo_mode=req.demo_mode, sources=sources)
+    results = await _score_texts(texts, demo_mode=req.demo_mode, sources=sources, search_keywords=req.keywords)
     return FetchResponse(
         keywords=req.keywords,
         fetched=len(raw_tweets),
@@ -213,8 +227,9 @@ def fetch_and_analyze(req: FetchRequest):
 
 @app.get("/api/alerts", response_model=List[ScoreResult])
 def get_alerts(
-    level:  Optional[str] = Query(None, description="Filter by alert level: LOW/MEDIUM/HIGH/CRITICAL"),
-    limit:  int           = Query(50, ge=1, le=500),
+    level:  Optional[str] = Query(
+        None, description="Filter by alert level: LOW/MEDIUM/HIGH/CRITICAL"),
+    limit:  int = Query(50, ge=1, le=500),
 ):
     """Return recent alert history (in-memory, most recent first)."""
     items = list(reversed(_alert_history))

@@ -11,6 +11,10 @@ The crisis score for a tweet is the sum of probabilities assigned to
 topics that were identified as "crisis topics" during fitting.
 """
 
+from gensim.models import CoherenceModel
+from gensim import corpora, models
+from nltk.stem import WordNetLemmatizer
+from nltk.corpus import stopwords
 import os
 import pickle
 from typing import List, Optional, Tuple
@@ -21,11 +25,7 @@ import pandas as pd
 import nltk
 nltk.download("stopwords", quiet=True)
 nltk.download("wordnet",   quiet=True)
-from nltk.corpus import stopwords
-from nltk.stem import WordNetLemmatizer
 
-from gensim import corpora, models
-from gensim.models import CoherenceModel
 
 RANDOM_SEED = 42
 _STOP = set(stopwords.words("english")) | {
@@ -40,11 +40,12 @@ _STOP = set(stopwords.words("english")) | {
 
 class LDAAnalyzer:
     def __init__(self, n_topics: int = 10, passes: int = 10):
-        self.n_topics    = n_topics
-        self.passes      = passes
-        self.lda_model:  Optional[models.LdaModel]    = None
+        self.n_topics = n_topics
+        self.passes = passes
+        self.lda_model:  Optional[models.LdaModel] = None
         self.dictionary: Optional[corpora.Dictionary] = None
-        self._crisis_topics: List[int] = []   # topic IDs that correlate with crises
+        # topic IDs that correlate with crises
+        self._crisis_topics: List[int] = []
 
     # ------------------------------------------------------------------
     # Coherence tuning — call to pick n_topics before fit()
@@ -57,9 +58,9 @@ class LDAAnalyzer:
     ) -> pd.DataFrame:
         """Train LDA for each k and return coherence scores as a DataFrame."""
         corpus_tokens = [_tokenize(t) for t in texts]
-        dictionary    = corpora.Dictionary(corpus_tokens)
+        dictionary = corpora.Dictionary(corpus_tokens)
         dictionary.filter_extremes(no_below=5, no_above=0.95)
-        bow_corpus    = [dictionary.doc2bow(t) for t in corpus_tokens]
+        bow_corpus = [dictionary.doc2bow(t) for t in corpus_tokens]
 
         rows = []
         for k in k_range:
@@ -105,11 +106,11 @@ class LDAAnalyzer:
         # Identify crisis topics: topics whose avg activation is higher
         # in crisis tweets than normal tweets
         topic_matrix = self._topic_matrix(bow_corpus)   # (n_docs, n_topics)
-        labels_arr   = np.array(labels)
+        labels_arr = np.array(labels)
 
         crisis_mean = topic_matrix[labels_arr == 1].mean(axis=0)
         normal_mean = topic_matrix[labels_arr == 0].mean(axis=0)
-        delta       = crisis_mean - normal_mean           # positive → crisis topic
+        delta = crisis_mean - normal_mean           # positive → crisis topic
 
         # Any topic where crisis mean > normal mean is a "crisis topic"
         self._crisis_topics = [i for i, d in enumerate(delta) if d > 0]
@@ -124,7 +125,7 @@ class LDAAnalyzer:
     def predict(self, texts: List[str]) -> List[float]:
         """Return crisis score 0.0–1.0 per tweet (sum of crisis-topic probs)."""
         assert self.lda_model is not None, "Call fit() first"
-        bow_corpus   = [self.dictionary.doc2bow(_tokenize(t)) for t in texts]
+        bow_corpus = [self.dictionary.doc2bow(_tokenize(t)) for t in texts]
         topic_matrix = self._topic_matrix(bow_corpus)
         if not self._crisis_topics:
             return [0.5] * len(texts)
@@ -160,8 +161,9 @@ class LDAAnalyzer:
         with open(os.path.join(path, "meta.pkl"), "rb") as f:
             meta = pickle.load(f)
         obj = cls(n_topics=meta["n_topics"], passes=meta["passes"])
-        obj.lda_model      = models.LdaModel.load(os.path.join(path, "lda.model"))
-        obj.dictionary     = corpora.Dictionary.load(os.path.join(path, "dictionary.dict"))
+        obj.lda_model = models.LdaModel.load(os.path.join(path, "lda.model"))
+        obj.dictionary = corpora.Dictionary.load(
+            os.path.join(path, "dictionary.dict"))
         obj._crisis_topics = meta["crisis_topics"]
         return obj
 
@@ -181,7 +183,7 @@ class LDAAnalyzer:
     def _print_topics(self) -> None:
         print("\nTop words per topic  [C=crisis, N=normal]")
         for tid, words in self.topic_words(8).items():
-            tag   = "C" if tid in self._crisis_topics else "N"
+            tag = "C" if tid in self._crisis_topics else "N"
             label = ", ".join(w for w, _ in words)
             print(f"  [{tag}] Topic {tid:2d}: {label}")
 
@@ -191,6 +193,7 @@ class LDAAnalyzer:
 # ---------------------------------------------------------------------------
 
 _lemmatizer = WordNetLemmatizer()
+
 
 def _tokenize(text: str) -> List[str]:
     tokens = str(text).lower().split()

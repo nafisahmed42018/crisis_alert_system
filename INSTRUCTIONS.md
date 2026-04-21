@@ -90,12 +90,12 @@ Open **http://localhost:3000** in your browser.
 
 ### Pages
 
-| Page | URL | What it does |
-|------|-----|-------------|
-| Dashboard | `/` | KPI strip, alert distribution chart, recent alerts. Auto-refreshes every 10 s. |
-| Analyzer | `/analyzer` | Paste any tweet text → get BERT/LSTM/LDA scores + recommendation card |
-| Fetch Tweets | `/fetch` | Enter keywords → fetches live tweets from X API → runs ensemble on all of them |
-| Alerts | `/alerts` | Full alert history, filterable by level (CRITICAL / HIGH / MEDIUM / LOW) |
+| Page         | URL         | What it does                                                                   |
+| ------------ | ----------- | ------------------------------------------------------------------------------ |
+| Dashboard    | `/`         | KPI strip, alert distribution chart, recent alerts. Auto-refreshes every 10 s. |
+| Analyzer     | `/analyzer` | Paste any tweet text → get BERT/LSTM/LDA scores + recommendation card          |
+| Fetch Tweets | `/fetch`    | Enter keywords → fetches live tweets from X API → runs ensemble on all of them |
+| Alerts       | `/alerts`   | Full alert history, filterable by level (CRITICAL / HIGH / MEDIUM / LOW)       |
 
 ---
 
@@ -117,14 +117,14 @@ Open **http://localhost:8501** in your browser.
 The notebooks are **course deliverables / exploration tools**, not required to run the app.
 You do **not** need to run them to use the system.
 
-| Notebook | Purpose |
-|----------|---------|
-| `01_exploration.ipynb` | EDA — label distribution, tweet lengths, top keywords, word clouds |
-| `02_bert_sentiment.ipynb` | BERT model development — training curves, confusion matrix, ROC curve |
-| `03_lstm_anomaly.ipynb` | LSTM anomaly detection on Climate Change Twitter time series |
-| `04_lda_topics.ipynb` | LDA topic modelling — coherence scores, topic word clouds |
-| `05_ensemble_demo.ipynb` | End-to-end pipeline demo — ensemble scoring, alert generation |
-| `06_final_submission.ipynb` | Full course submission notebook — all models + results in one place |
+| Notebook                    | Purpose                                                               |
+| --------------------------- | --------------------------------------------------------------------- |
+| `01_exploration.ipynb`      | EDA — label distribution, tweet lengths, top keywords, word clouds    |
+| `02_bert_sentiment.ipynb`   | BERT model development — training curves, confusion matrix, ROC curve |
+| `03_lstm_anomaly.ipynb`     | LSTM anomaly detection on Climate Change Twitter time series          |
+| `04_lda_topics.ipynb`       | LDA topic modelling — coherence scores, topic word clouds             |
+| `05_ensemble_demo.ipynb`    | End-to-end pipeline demo — ensemble scoring, alert generation         |
+| `06_final_submission.ipynb` | Full course submission notebook — all models + results in one place   |
 
 To run a notebook, open it in VS Code or JupyterLab and run all cells.
 The kernel must use Python 3.13.

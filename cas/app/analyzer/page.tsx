@@ -6,14 +6,17 @@ import { AlertBadge } from "@/components/AlertBadge";
 import { ScoreGauge } from "@/components/ScoreGauge";
 import { ModelBars } from "@/components/ModelBars";
 import { RecommendationCard } from "@/components/RecommendationCard";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { Search, Loader2 } from "lucide-react";
 
 const EXAMPLES = [
-  { label: "Wildfire 🔴",  text: "Massive wildfire destroys thousands of homes, evacuation ordered across three counties" },
-  { label: "Oil spill 🔴", text: "Oil spill reported near Gulf coast, marine life at critical risk, emergency teams deployed" },
-  { label: "Flood 🟠",     text: "Flash flood warnings issued for low-lying areas, rivers approaching record levels" },
-  { label: "Normal 🟢",    text: "Just had the best weekend camping trip, nature is so beautiful this time of year" },
-  { label: "Sports 🟢",    text: "What a game last night! Cannot believe that final score, absolute thriller" },
+  { label: "Wildfire",  text: "Massive wildfire destroys thousands of homes, evacuation ordered across three counties" },
+  { label: "Oil Spill", text: "Oil spill reported near Gulf coast, marine life at critical risk, emergency teams deployed" },
+  { label: "Flood",     text: "Flash flood warnings issued for low-lying areas, rivers approaching record levels" },
+  { label: "Normal",    text: "Just had the best weekend camping trip, nature is so beautiful this time of year" },
+  { label: "Sports",    text: "What a game last night! Cannot believe that final score, absolute thriller" },
 ];
 
 export default function AnalyzerPage() {
@@ -37,10 +40,10 @@ export default function AnalyzerPage() {
   };
 
   return (
-    <div className="space-y-6 max-w-3xl">
+    <div className="max-w-3xl space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Tweet Analyzer</h1>
-        <p className="text-gray-500 text-sm mt-1">
+        <h1 className="text-2xl font-bold">Tweet Analyzer</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
           Enter any tweet text to score it through the BERT + LSTM + LDA ensemble.
         </p>
       </div>
@@ -48,54 +51,64 @@ export default function AnalyzerPage() {
       {/* Example picker */}
       <div className="flex flex-wrap gap-2">
         {EXAMPLES.map((ex) => (
-          <button
+          <Button
             key={ex.label}
+            variant="outline"
+            size="sm"
+            className="rounded-full text-xs"
             onClick={() => { setText(ex.text); setResult(null); }}
-            className="text-xs bg-white border border-gray-200 rounded-full px-3 py-1 hover:border-blue-400 hover:text-blue-600 transition-colors"
           >
             {ex.label}
-          </button>
+          </Button>
         ))}
       </div>
 
       {/* Input */}
       <div className="space-y-3">
-        <textarea
+        <Textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
           rows={3}
           placeholder="Type or paste a tweet here…"
-          className="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
+          className="resize-none"
         />
-        <button
+        <Button
           onClick={analyze}
           disabled={loading || !text.trim()}
-          className="flex items-center gap-2 bg-blue-600 text-white rounded-xl px-5 py-2.5 text-sm font-semibold hover:bg-blue-700 disabled:opacity-50 transition-colors"
+          className="gap-2"
         >
           {loading ? <Loader2 size={15} className="animate-spin" /> : <Search size={15} />}
           {loading ? "Analyzing…" : "Analyze Tweet"}
-        </button>
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        </Button>
+        {error && <p className="text-sm text-destructive">{error}</p>}
       </div>
 
       {/* Results */}
       {result && (
-        <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
-          <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
-            <AlertBadge level={result.alert_level} prob={result.crisis_probability} />
-            <p className="mt-3 text-sm text-gray-700 leading-relaxed">{result.text}</p>
-          </div>
+        <div className="space-y-4">
+          <Card>
+            <CardContent className="pt-5">
+              <AlertBadge level={result.alert_level} prob={result.crisis_probability} />
+              <p className="mt-3 text-sm leading-relaxed">{result.text}</p>
+            </CardContent>
+          </Card>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm flex items-center justify-center">
-              <ScoreGauge prob={result.crisis_probability} level={result.alert_level} />
-            </div>
-            <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
-              <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
-                Model Contributions
-              </h3>
-              <ModelBars bert={result.bert_score} lstm={result.lstm_score} lda={result.lda_score} />
-            </div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <Card>
+              <CardContent className="flex items-center justify-center pt-5 pb-5">
+                <ScoreGauge prob={result.crisis_probability} level={result.alert_level} />
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  Model Contributions
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ModelBars bert={result.bert_score} lstm={result.lstm_score} lda={result.lda_score} />
+              </CardContent>
+            </Card>
           </div>
 
           <RecommendationCard result={result} />

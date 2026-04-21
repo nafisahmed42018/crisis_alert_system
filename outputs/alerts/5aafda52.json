@@ -1,0 +1,11 @@
+{
+  "alert_id": "5aafda52",
+  "level": "HIGH",
+  "crisis_probability": 0.5687,
+  "bert_score": 0.983,
+  "lstm_score": 0.5,
+  "lda_score": 0.1887,
+  "trigger_text": "this was the actual report about a nuclear emergency warning sent out in error from pickering nuclear power plant to re",
+  "timestamp": "2026-04-21T18:05:37.393250+00:00",
+  "top_tweets": []
+}

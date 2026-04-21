@@ -13,7 +13,7 @@ export interface ScoreResult {
   escalation_timing: string;
   recommended_actions: string[];
   stakeholders: string[];
-  sentiment_trajectory: "ESCALATING" | "STABILIZING" | "DE_ESCALATING";
+  sentiment_trajectory: "EMERGENCY_INTERVENTION" | "ESCALATING" | "STABILIZING" | "DE_ESCALATING";
   predicted_peak: string | null;
   source: string;
   created_at: string;

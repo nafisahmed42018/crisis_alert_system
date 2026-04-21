@@ -44,13 +44,13 @@ class AlertEngine:
         alerts = []
         for _, row in qualifying.iterrows():
             alert = CrisisAlert(
-                alert_id           = str(uuid.uuid4())[:8],
-                level              = row["alert_level"],
-                crisis_probability = row["crisis_probability"],
-                bert_score         = row["bert_score"],
-                lstm_score         = row["lstm_score"],
-                lda_score          = row["lda_score"],
-                trigger_text       = row["text"][:280],
+                alert_id=str(uuid.uuid4())[:8],
+                level=row["alert_level"],
+                crisis_probability=row["crisis_probability"],
+                bert_score=row["bert_score"],
+                lstm_score=row["lstm_score"],
+                lda_score=row["lda_score"],
+                trigger_text=row["text"][:280],
             )
             alerts.append(alert)
 
@@ -62,24 +62,25 @@ class AlertEngine:
         Uses the maximum crisis_probability tweet as the trigger.
         """
         worst = results_df.loc[results_df["crisis_probability"].idxmax()]
-        top5  = (results_df
-                 .nlargest(5, "crisis_probability")["text"]
-                 .tolist())
+        top5 = (results_df
+                .nlargest(5, "crisis_probability")["text"]
+                .tolist())
 
         return CrisisAlert(
-            alert_id           = str(uuid.uuid4())[:8],
-            level              = worst["alert_level"],
-            crisis_probability = worst["crisis_probability"],
-            bert_score         = worst["bert_score"],
-            lstm_score         = worst["lstm_score"],
-            lda_score          = worst["lda_score"],
-            trigger_text       = worst["text"][:280],
-            top_tweets         = top5,
+            alert_id=str(uuid.uuid4())[:8],
+            level=worst["alert_level"],
+            crisis_probability=worst["crisis_probability"],
+            bert_score=worst["bert_score"],
+            lstm_score=worst["lstm_score"],
+            lda_score=worst["lda_score"],
+            trigger_text=worst["text"][:280],
+            top_tweets=top5,
         )
 
     def save(self, alert: CrisisAlert, output_dir: str = "outputs/alerts/") -> str:
         os.makedirs(output_dir, exist_ok=True)
-        path = os.path.join(output_dir, f"alert_{alert.alert_id}_{alert.level}.json")
+        path = os.path.join(
+            output_dir, f"alert_{alert.alert_id}_{alert.level}.json")
         with open(path, "w") as f:
             f.write(alert.to_json())
         return path
@@ -90,7 +91,7 @@ class AlertEngine:
         df = pd.DataFrame(rows)
         if df.empty:
             return df
-        return df[["alert_id","level","crisis_probability","bert_score",
-                   "lstm_score","lda_score","timestamp"]].sort_values(
+        return df[["alert_id", "level", "crisis_probability", "bert_score",
+                   "lstm_score", "lda_score", "timestamp"]].sort_values(
             "crisis_probability", ascending=False
         ).reset_index(drop=True)

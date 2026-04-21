@@ -5,9 +5,9 @@ interface Props { bert: number; lstm: number; lda: number }
 
 export function ModelBars({ bert, lstm, lda }: Props) {
   const data = [
-    { name: "BERT (40%)",  score: bert,  fill: "#dc2626" },
-    { name: "LSTM (40%)", score: lstm,  fill: "#3b82f6" },
-    { name: "LDA  (20%)", score: lda,   fill: "#10b981" },
+    { name: "BERT (40%)", score: bert, fill: "#dc2626" },
+    { name: "LSTM (40%)", score: lstm, fill: "#3b82f6" },
+    { name: "LDA  (20%)", score: lda,  fill: "#10b981" },
   ];
 
   return (

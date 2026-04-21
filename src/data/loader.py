@@ -120,6 +120,7 @@ def _validate(df: pd.DataFrame) -> None:
     if "label" in df.columns:
         invalid = ~df["label"].isin([0, 1])
         if invalid.any():
-            raise ValueError(f"label column has non-binary values: {df.loc[invalid, 'label'].unique()}")
+            raise ValueError(
+                f"label column has non-binary values: {df.loc[invalid, 'label'].unique()}")
 
     print("Validation passed")

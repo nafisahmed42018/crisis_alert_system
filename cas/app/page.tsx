@@ -4,10 +4,9 @@ import Link from "next/link";
 import { api } from "@/lib/api";
 import { ScoreResult, AlertLevel } from "@/lib/types";
 import { AlertBadge } from "@/components/AlertBadge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, Search, Radio, AlertTriangle } from "lucide-react";
-import {
-  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell,
-} from "recharts";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
 
 const LEVEL_COLORS: Record<AlertLevel, string> = {
   LOW:      "#6b7280",
@@ -51,58 +50,64 @@ export default function DashboardPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Crisis Alert Dashboard</h1>
-        <p className="text-gray-500 text-sm mt-1">
+        <h1 className="text-2xl font-bold">Crisis Alert Dashboard</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
           Real-time social media monitoring — BERT (40%) + LSTM (40%) + LDA (20%)
         </p>
       </div>
 
       {/* KPI strip */}
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-5">
         {[
-          { label: "Total Alerts",    value: alerts.length, color: "text-gray-900" },
-          { label: "🔴 CRITICAL",     value: counts[0].count, color: "text-red-600" },
-          { label: "🟠 HIGH",         value: counts[1].count, color: "text-orange-500" },
-          { label: "🟡 MEDIUM",       value: counts[2].count, color: "text-yellow-500" },
-          { label: "Avg Probability", value: avgProb,         color: "text-gray-700" },
+          { label: "Total Alerts",    value: alerts.length, className: "text-foreground" },
+          { label: "CRITICAL",          value: counts[0].count, className: "text-destructive" },
+          { label: "HIGH",             value: counts[1].count, className: "text-orange-500" },
+          { label: "MEDIUM",           value: counts[2].count, className: "text-yellow-500" },
+          { label: "Avg Probability", value: avgProb,         className: "text-foreground" },
         ].map((k) => (
-          <div key={k.label} className="bg-white rounded-xl border border-gray-200 p-4 text-center shadow-sm">
-            <div className="text-xs text-gray-500 mb-1">{k.label}</div>
-            <div className={`text-2xl font-bold ${k.color}`}>{k.value}</div>
-          </div>
+          <Card key={k.label} size="sm">
+            <CardContent className="pt-3 pb-3 text-center">
+              <div className="text-xs text-muted-foreground mb-1">{k.label}</div>
+              <div className={`text-2xl font-bold ${k.className}`}>{k.value}</div>
+            </CardContent>
+          </Card>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Alert distribution chart */}
-        <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
-          <h2 className="font-semibold text-gray-700 mb-4">Alert Level Distribution</h2>
-          {alerts.length === 0 ? (
-            <div className="h-40 flex items-center justify-center text-gray-400 text-sm">
-              No alerts yet — analyze some tweets to see results.
-            </div>
-          ) : (
-            <ResponsiveContainer width="100%" height={180}>
-              <BarChart data={counts} margin={{ top: 4, bottom: 4 }}>
-                <XAxis dataKey="level" tick={{ fontSize: 12 }} />
-                <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
-                <Tooltip />
-                <Bar dataKey="count" radius={[4, 4, 0, 0]}>
-                  {counts.map((c) => (
-                    <Cell key={c.level} fill={LEVEL_COLORS[c.level]} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          )}
-        </div>
+        <Card>
+          <CardHeader className="pb-0">
+            <CardTitle className="text-sm font-semibold text-muted-foreground">Alert Level Distribution</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {alerts.length === 0 ? (
+              <div className="flex h-40 items-center justify-center text-sm text-muted-foreground">
+                No alerts yet — analyze some tweets to see results.
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height={180}>
+                <BarChart data={counts} margin={{ top: 4, bottom: 4 }}>
+                  <XAxis dataKey="level" tick={{ fontSize: 12 }} />
+                  <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
+                  <Tooltip />
+                  <Bar dataKey="count" radius={[4, 4, 0, 0]}>
+                    {counts.map((c) => (
+                      <Cell key={c.level} fill={LEVEL_COLORS[c.level]} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Quick-start cards */}
         <div className="grid grid-cols-1 gap-4">
           {[
             {
               href: "/analyzer",
-              icon: <Search size={22} className="text-blue-500" />,
+              icon: <Search size={22} className="text-primary" />,
               title: "Single Tweet Analyzer",
               desc: "Paste any tweet to get an instant ensemble crisis score and recommendations.",
             },
@@ -119,16 +124,16 @@ export default function DashboardPage() {
               desc: "Browse all processed alerts with full recommendations and escalation paths.",
             },
           ].map((c) => (
-            <Link
-              key={c.href}
-              href={c.href}
-              className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm hover:shadow-md hover:border-blue-300 transition-all flex items-start gap-3"
-            >
-              <div className="mt-0.5">{c.icon}</div>
-              <div>
-                <div className="font-semibold text-gray-800 text-sm">{c.title}</div>
-                <div className="text-gray-500 text-xs mt-0.5">{c.desc}</div>
-              </div>
+            <Link key={c.href} href={c.href}>
+              <Card className="cursor-pointer transition-shadow hover:shadow-md">
+                <CardContent className="flex items-start gap-3 pt-4 pb-4">
+                  <div className="mt-0.5">{c.icon}</div>
+                  <div>
+                    <div className="font-semibold text-sm">{c.title}</div>
+                    <div className="text-xs text-muted-foreground mt-0.5">{c.desc}</div>
+                  </div>
+                </CardContent>
+              </Card>
             </Link>
           ))}
         </div>
@@ -137,31 +142,32 @@ export default function DashboardPage() {
       {/* Recent alerts */}
       {recent.length > 0 && (
         <div>
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="font-semibold text-gray-700 flex items-center gap-2">
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="flex items-center gap-2 font-semibold text-sm text-muted-foreground">
               <TrendingUp size={16} /> Recent Alerts
             </h2>
-            <Link href="/alerts" className="text-sm text-blue-500 hover:underline">
+            <Link href="/alerts" className="text-sm text-primary hover:underline">
               View all →
             </Link>
           </div>
           <div className="space-y-2">
             {recent.map((a) => (
-              <div
-                key={a.id}
-                className="bg-white border border-gray-200 rounded-lg px-4 py-3 flex items-center gap-3 shadow-sm"
-              >
-                <AlertBadge level={a.alert_level} prob={a.crisis_probability} />
-                <p className="text-sm text-gray-700 truncate flex-1">{a.text}</p>
-                <span className="text-xs text-gray-400 shrink-0">{a.crisis_type.replace(/_/g, " ")}</span>
-              </div>
+              <Card key={a.id} size="sm">
+                <CardContent className="flex items-center gap-3 py-3">
+                  <AlertBadge level={a.alert_level} prob={a.crisis_probability} />
+                  <p className="flex-1 truncate text-sm">{a.text}</p>
+                  <span className="shrink-0 text-xs text-muted-foreground">
+                    {a.crisis_type.replace(/_/g, " ")}
+                  </span>
+                </CardContent>
+              </Card>
             ))}
           </div>
         </div>
       )}
 
       {loading && (
-        <div className="text-center text-sm text-gray-400 py-8">
+        <div className="py-8 text-center text-sm text-muted-foreground">
           Connecting to backend…
         </div>
       )}

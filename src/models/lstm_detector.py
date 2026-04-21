@@ -28,7 +28,7 @@ import torch.nn as nn
 from sklearn.preprocessing import StandardScaler
 from torch.utils.data import DataLoader, Dataset
 
-WINDOW     = 24          # hours of history per sample
+WINDOW = 24          # hours of history per sample
 N_FEATURES = 6
 RANDOM_SEED = 42
 torch.manual_seed(RANDOM_SEED)
@@ -58,27 +58,29 @@ def build_timeseries(
         chunksize=chunksize,
     )):
         chunk["hour"] = chunk["created_at"].dt.floor("h")
-        chunk["negative"]        = (chunk["sentiment"] < 0).astype(int)
-        chunk["is_aggressive"]   = (chunk["aggressiveness"] == "aggressive").astype(int)
-        chunk["is_weather"]      = (chunk["topic"] == "Weather Extremes").astype(int)
+        chunk["negative"] = (chunk["sentiment"] < 0).astype(int)
+        chunk["is_aggressive"] = (
+            chunk["aggressiveness"] == "aggressive").astype(int)
+        chunk["is_weather"] = (
+            chunk["topic"] == "Weather Extremes").astype(int)
 
         agg = chunk.groupby("hour").agg(
-            mean_sentiment  = ("sentiment",      "mean"),
-            tweet_volume    = ("sentiment",      "count"),
-            pct_negative    = ("negative",       "mean"),
-            pct_aggressive  = ("is_aggressive",  "mean"),
-            pct_weather     = ("is_weather",     "mean"),
+            mean_sentiment=("sentiment",      "mean"),
+            tweet_volume=("sentiment",      "count"),
+            pct_negative=("negative",       "mean"),
+            pct_aggressive=("is_aggressive",  "mean"),
+            pct_weather=("is_weather",     "mean"),
         ).reset_index()
         chunks.append(agg)
         if (i + 1) % 5 == 0:
             print(f"  processed {(i+1)*chunksize/1e6:.1f}M rows...")
 
     ts = pd.concat(chunks).groupby("hour").agg(
-        mean_sentiment = ("mean_sentiment", "mean"),
-        tweet_volume   = ("tweet_volume",   "sum"),
-        pct_negative   = ("pct_negative",   "mean"),
-        pct_aggressive = ("pct_aggressive", "mean"),
-        pct_weather    = ("pct_weather",    "mean"),
+        mean_sentiment=("mean_sentiment", "mean"),
+        tweet_volume=("tweet_volume",   "sum"),
+        pct_negative=("pct_negative",   "mean"),
+        pct_aggressive=("pct_aggressive", "mean"),
+        pct_weather=("pct_weather",    "mean"),
     ).reset_index().sort_values("hour").reset_index(drop=True)
 
     # Sentiment velocity = hourly change in mean_sentiment
@@ -112,7 +114,8 @@ def label_from_sentiment(
 
     crisis_mask = (
         # Negative sentiment during high-volume periods
-        ((ts["mean_sentiment"] < sentiment_threshold) & (ts["tweet_volume"] >= vol_thresh))
+        ((ts["mean_sentiment"] < sentiment_threshold)
+         & (ts["tweet_volume"] >= vol_thresh))
         |
         # Sharp sentiment velocity drop (sudden negative swing)
         (ts["sentiment_velocity"] < velocity_threshold)
@@ -136,8 +139,10 @@ def label_from_disasters(
     """
     disasters = pd.read_csv(disasters_path,
                             usecols=["start_date", "end_date", "Total Deaths"])
-    disasters["start_date"] = pd.to_datetime(disasters["start_date"], utc=True, errors="coerce")
-    disasters["end_date"]   = pd.to_datetime(disasters["end_date"],   utc=True, errors="coerce")
+    disasters["start_date"] = pd.to_datetime(
+        disasters["start_date"], utc=True, errors="coerce")
+    disasters["end_date"] = pd.to_datetime(
+        disasters["end_date"],   utc=True, errors="coerce")
     disasters = disasters.dropna(subset=["start_date"])
     disasters = disasters[disasters["Total Deaths"] >= min_deaths]
 
@@ -147,12 +152,15 @@ def label_from_disasters(
 
     delta = pd.Timedelta(hours=window_hours)
     for _, row in disasters.iterrows():
-        end = row["end_date"] if pd.notna(row["end_date"]) else row["start_date"]
-        mask = (ts["hour"] >= row["start_date"] - delta) & (ts["hour"] <= end + delta)
+        end = row["end_date"] if pd.notna(
+            row["end_date"]) else row["start_date"]
+        mask = (ts["hour"] >= row["start_date"] -
+                delta) & (ts["hour"] <= end + delta)
         ts.loc[mask, "label"] = 1
 
     pos = ts["label"].sum()
-    print(f"Crisis hours (deaths>={min_deaths}): {pos:,} / {len(ts):,}  ({pos/len(ts)*100:.1f}%)")
+    print(
+        f"Crisis hours (deaths>={min_deaths}): {pos:,} / {len(ts):,}  ({pos/len(ts)*100:.1f}%)")
     return ts
 
 
@@ -171,7 +179,7 @@ class _WindowDataset(Dataset):
         self.X = torch.tensor(X, dtype=torch.float32)
         self.y = torch.tensor(y, dtype=torch.float32)
 
-    def __len__(self):  return len(self.y)
+    def __len__(self): return len(self.y)
     def __getitem__(self, i): return self.X[i], self.y[i]
 
 
@@ -202,12 +210,13 @@ class _LSTMNet(nn.Module):
 
 class LSTMDetector:
     def __init__(self, window: int = WINDOW, hidden: int = 64, n_layers: int = 2):
-        self.window   = window
-        self.hidden   = hidden
+        self.window = window
+        self.hidden = hidden
         self.n_layers = n_layers
-        self.model:   Optional[_LSTMNet]       = None
+        self.model:   Optional[_LSTMNet] = None
         self.scaler:  Optional[StandardScaler] = None
-        self._hour_scores: Optional[pd.Series] = None  # index=hour, value=score
+        # index=hour, value=score
+        self._hour_scores: Optional[pd.Series] = None
 
     # ------------------------------------------------------------------
     # Training
@@ -231,17 +240,20 @@ class LSTMDetector:
         n = X_train.shape[0] * X_train.shape[1]
         self.scaler.fit(X_train.reshape(n, N_FEATURES))
         X_train = self._scale(X_train)
-        X_val   = self._scale(X_val)
+        X_val = self._scale(X_val)
 
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        print(f"Training on {device}  |  train={len(y_train):,}  val={len(y_val):,}")
+        print(
+            f"Training on {device}  |  train={len(y_train):,}  val={len(y_val):,}")
 
         pos_weight = torch.tensor([(y_train == 0).sum() / max((y_train == 1).sum(), 1)],
                                   dtype=torch.float32).to(device)
 
-        self.model = _LSTMNet(N_FEATURES, self.hidden, self.n_layers).to(device)
-        optimiser  = torch.optim.Adam(self.model.parameters(), lr=lr)
-        criterion  = nn.BCELoss(weight=None)  # class weight via pos_weight below
+        self.model = _LSTMNet(N_FEATURES, self.hidden,
+                              self.n_layers).to(device)
+        optimiser = torch.optim.Adam(self.model.parameters(), lr=lr)
+        # class weight via pos_weight below
+        criterion = nn.BCELoss(weight=None)
         criterion_w = nn.BCEWithLogitsLoss(pos_weight=pos_weight)
 
         train_loader = DataLoader(_WindowDataset(X_train, y_train),
@@ -258,7 +270,8 @@ class LSTMDetector:
                 optimiser.zero_grad()
                 # Use raw logits path for weighted BCE
                 out_raw = self.model.lstm(xb)[0][:, -1, :]
-                logits  = self.model.head[:-1](out_raw).squeeze(1)  # pre-sigmoid
+                logits = self.model.head[:-
+                                         1](out_raw).squeeze(1)  # pre-sigmoid
                 # Recompute properly:
                 pred = self.model(xb)
                 loss = criterion(pred, yb)
@@ -273,14 +286,16 @@ class LSTMDetector:
                 yv = torch.tensor(y_val, dtype=torch.float32).to(device)
                 val_pred = self.model(xv)
                 val_loss = criterion(val_pred, yv).item()
-                val_acc  = ((val_pred >= 0.5).float() == yv).float().mean().item()
+                val_acc = ((val_pred >= 0.5).float()
+                           == yv).float().mean().item()
 
             print(f"Epoch {epoch:2d}/{epochs}  train_loss={train_loss/len(train_loader):.4f}"
                   f"  val_loss={val_loss:.4f}  val_acc={val_acc:.3f}")
 
             if val_loss < best_val_loss:
                 best_val_loss = val_loss
-                best_state    = {k: v.clone() for k, v in self.model.state_dict().items()}
+                best_state = {k: v.clone()
+                              for k, v in self.model.state_dict().items()}
                 patience_counter = 0
             else:
                 patience_counter += 1
@@ -299,7 +314,7 @@ class LSTMDetector:
     def predict_timeseries(self, ts: pd.DataFrame) -> pd.Series:
         """Return crisis score per hour bucket as a Series indexed by hour."""
         X_raw, _ = self._make_windows(ts, require_label=False)
-        X_scaled  = self._scale(X_raw)
+        X_scaled = self._scale(X_raw)
 
         device = next(self.model.parameters()).device
         self.model.eval()
@@ -318,7 +333,8 @@ class LSTMDetector:
         Returns 0.5 (neutral) for any tweet with no timestamp.
         """
         assert self._hour_scores is not None, "Call predict_timeseries() first"
-        ts = pd.to_datetime(timestamps, utc=True, errors="coerce").dt.floor("h")
+        ts = pd.to_datetime(timestamps, utc=True,
+                            errors="coerce").dt.floor("h")
         scores = ts.map(self._hour_scores).fillna(0.5).tolist()
         return scores
 
@@ -341,11 +357,13 @@ class LSTMDetector:
     def load(cls, path: str) -> "LSTMDetector":
         with open(os.path.join(path, "meta.pkl"), "rb") as f:
             meta = pickle.load(f)
-        obj = cls(window=meta["window"], hidden=meta["hidden"], n_layers=meta["n_layers"])
-        obj.scaler       = meta["scaler"]
+        obj = cls(window=meta["window"],
+                  hidden=meta["hidden"], n_layers=meta["n_layers"])
+        obj.scaler = meta["scaler"]
         obj._hour_scores = meta.get("hour_scores")
         obj.model = _LSTMNet(N_FEATURES, obj.hidden, obj.n_layers)
-        obj.model.load_state_dict(torch.load(os.path.join(path, "lstm.pt"), weights_only=True))
+        obj.model.load_state_dict(torch.load(
+            os.path.join(path, "lstm.pt"), weights_only=True))
         obj.model.eval()
         return obj
 
@@ -355,7 +373,8 @@ class LSTMDetector:
 
     def _make_windows(self, ts: pd.DataFrame, require_label: bool = True):
         feats = ts[FEATURE_COLS].values.astype(np.float32)
-        labels = ts["label"].values.astype(np.float32) if require_label else np.zeros(len(ts))
+        labels = ts["label"].values.astype(
+            np.float32) if require_label else np.zeros(len(ts))
 
         X, y = [], []
         for i in range(self.window, len(feats)):

@@ -30,9 +30,11 @@ def clean_dataset(df: pd.DataFrame) -> pd.DataFrame:
 
     # Normalise timestamp → UTC, derive hour bucket
     if pd.api.types.is_datetime64_any_dtype(df["created_at"]):
-        df["created_at"] = df["created_at"].dt.tz_localize("UTC") if df["created_at"].dt.tz is None else df["created_at"]
+        df["created_at"] = df["created_at"].dt.tz_localize(
+            "UTC") if df["created_at"].dt.tz is None else df["created_at"]
     else:
-        df["created_at"] = pd.to_datetime(df["created_at"], utc=True, errors="coerce")
+        df["created_at"] = pd.to_datetime(
+            df["created_at"], utc=True, errors="coerce")
 
     df["hour_bucket"] = df["created_at"].dt.floor("h")
 
@@ -46,7 +48,8 @@ def clean_dataset(df: pd.DataFrame) -> pd.DataFrame:
         df["label"] = pd.NA
 
     # Select and order output columns
-    keep = ["id", "text_clean", "text_original", "created_at", "hour_bucket", "label", "engagement"]
+    keep = ["id", "text_clean", "text_original",
+            "created_at", "hour_bucket", "label", "engagement"]
     available = [c for c in keep if c in df.columns]
     df = df[available].reset_index(drop=True)
 
@@ -63,7 +66,8 @@ def make_sample(df: pd.DataFrame, n: int = 100, random_state: int = 42) -> pd.Da
         groups = []
         for lbl in [0, 1]:
             subset = df[df["label"] == lbl]
-            groups.append(subset.sample(min(per_class, len(subset)), random_state=random_state))
+            groups.append(subset.sample(
+                min(per_class, len(subset)), random_state=random_state))
         return pd.concat(groups).sample(frac=1, random_state=random_state).reset_index(drop=True)
     return df.sample(min(n, len(df)), random_state=random_state).reset_index(drop=True)
 

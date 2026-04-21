@@ -138,7 +138,8 @@ class Recommendation:
 
 def classify_crisis_type(text: str, lda_topic_words: Optional[List[str]] = None) -> str:
     """Infer crisis type from text + optional LDA topic words."""
-    tokens = re.findall(r"\b\w+\b", (text + " " + " ".join(lda_topic_words or [])).lower())
+    tokens = re.findall(
+        r"\b\w+\b", (text + " " + " ".join(lda_topic_words or [])).lower())
     token_set = set(tokens)
 
     scores: dict[str, int] = {}
@@ -149,15 +150,12 @@ def classify_crisis_type(text: str, lda_topic_words: Optional[List[str]] = None)
     return best if scores[best] > 0 else "general"
 
 
-def infer_trajectory(bert_score: float, lstm_score: float, lda_score: float) -> tuple[str, str]:
-    """Return (trajectory_label, predicted_peak) based on model scores."""
-    combined = 0.4 * bert_score + 0.4 * lstm_score + 0.2 * lda_score
-
-    if lstm_score > 0.65 and bert_score > 0.65:
-        return "ESCALATING", "4–8 hours"
-    if combined > 0.55:
-        return "STABILIZING", "1–2 hours"
-    return "DE_ESCALATING", None
+_TRAJECTORY_MAP: dict[str, tuple[str, str | None]] = {
+    "CRITICAL": ("EMERGENCY_INTERVENTION", "Within 1–2 hours"),
+    "HIGH":     ("EMERGENCY_INTERVENTION", "Within 4–6 hours"),
+    "MEDIUM":   ("ESCALATING",             "4–8 hours"),
+    "LOW":      ("STABILIZING",            None),
+}
 
 
 def build_recommendation(
@@ -168,11 +166,11 @@ def build_recommendation(
     lda_score: float,
     lda_topic_words: Optional[List[str]] = None,
 ) -> Recommendation:
-    crisis_type   = classify_crisis_type(text, lda_topic_words)
-    escalation    = _ESCALATION_MATRIX[alert_level]
-    actions       = _ACTION_MATRIX.get(crisis_type, _ACTION_MATRIX["general"])
-    stakeholders  = _STAKEHOLDERS.get(crisis_type, _STAKEHOLDERS["general"])
-    trajectory, peak = infer_trajectory(bert_score, lstm_score, lda_score)
+    crisis_type = classify_crisis_type(text, lda_topic_words)
+    escalation = _ESCALATION_MATRIX[alert_level]
+    actions = _ACTION_MATRIX.get(crisis_type, _ACTION_MATRIX["general"])
+    stakeholders = _STAKEHOLDERS.get(crisis_type, _STAKEHOLDERS["general"])
+    trajectory, peak = _TRAJECTORY_MAP.get(alert_level, ("STABILIZING", None))
 
     return Recommendation(
         crisis_type=crisis_type,
