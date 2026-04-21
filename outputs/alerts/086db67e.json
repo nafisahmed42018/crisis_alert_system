@@ -1,0 +1,11 @@
+{
+  "alert_id": "086db67e",
+  "level": "CRITICAL",
+  "crisis_probability": 0.6368,
+  "bert_score": 0.9981,
+  "lstm_score": 0.5,
+  "lda_score": 0.1876,
+  "trigger_text": "sudan s farmers work to save good soils as climate change brings desert closer hannah mcneish ibgeog core",
+  "timestamp": "2026-04-19T22:22:40.787816+00:00",
+  "top_tweets": []
+}

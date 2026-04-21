@@ -1,0 +1,11 @@
+{
+  "alert_id": "159f57f1",
+  "level": "CRITICAL",
+  "crisis_probability": 0.6598,
+  "bert_score": 0.9907,
+  "lstm_score": 0.5,
+  "lda_score": 0.3175,
+  "trigger_text": "suicide bomber kills 15 in saudi security site mosque - a suicide bomber killed at least 15 people in an attack on...",
+  "timestamp": "2026-04-19T10:11:35.878368+00:00",
+  "top_tweets": []
+}

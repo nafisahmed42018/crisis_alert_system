@@ -1,0 +1,11 @@
+{
+  "alert_id": "ad303131",
+  "level": "HIGH",
+  "crisis_probability": 0.5885,
+  "bert_score": 0.9666,
+  "lstm_score": 0.5,
+  "lda_score": 0.0095,
+  "trigger_text": "violent windstorm what it means here is a powerful north atlantic windstorm that delivered violent hurricane force w",
+  "timestamp": "2026-04-20T00:34:21.178277+00:00",
+  "top_tweets": []
+}

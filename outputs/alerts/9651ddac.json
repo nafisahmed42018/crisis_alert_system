@@ -1,0 +1,11 @@
+{
+  "alert_id": "9651ddac",
+  "level": "HIGH",
+  "crisis_probability": 0.5978,
+  "bert_score": 0.9879,
+  "lstm_score": 0.5,
+  "lda_score": 0.013,
+  "trigger_text": "two cruciate ligament injuries in one game a bad day for young serie a stars",
+  "timestamp": "2026-04-20T10:37:30.054416+00:00",
+  "top_tweets": []
+}

@@ -1,0 +1,11 @@
+{
+  "alert_id": "ead555d4",
+  "level": "HIGH",
+  "crisis_probability": 0.5619,
+  "bert_score": 0.8559,
+  "lstm_score": 0.5,
+  "lda_score": 0.0974,
+  "trigger_text": "this injustice must be stopped homes of sikh victims displaced in 1984 riots razed by madhya pradesh this is why we need",
+  "timestamp": "2026-04-20T00:34:21.178361+00:00",
+  "top_tweets": []
+}

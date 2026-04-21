@@ -1,0 +1,11 @@
+{
+  "alert_id": "5a5c9428",
+  "level": "CRITICAL",
+  "crisis_probability": 0.6597,
+  "bert_score": 0.9899,
+  "lstm_score": 0.5,
+  "lda_score": 0.3186,
+  "trigger_text": "70 years ago the first atomic attack flattened hiroshima 3 days later it was nagasaki both war crimes to put moscow in its place",
+  "timestamp": "2026-04-19T10:11:35.860566+00:00",
+  "top_tweets": []
+}

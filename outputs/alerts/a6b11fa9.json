@@ -1,0 +1,11 @@
+{
+  "alert_id": "a6b11fa9",
+  "level": "CRITICAL",
+  "crisis_probability": 0.6308,
+  "bert_score": 0.9986,
+  "lstm_score": 0.5,
+  "lda_score": 0.1567,
+  "trigger_text": "rt macron france will pay for us share of climate change research after trump left paris deal",
+  "timestamp": "2026-04-19T22:22:40.787787+00:00",
+  "top_tweets": []
+}

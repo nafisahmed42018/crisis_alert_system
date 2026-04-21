@@ -1,0 +1,11 @@
+{
+  "alert_id": "7924795c",
+  "level": "HIGH",
+  "crisis_probability": 0.5706,
+  "bert_score": 0.9878,
+  "lstm_score": 0.5,
+  "lda_score": 0.1887,
+  "trigger_text": "shocking moment a bus is engulfed by a massive sinkhole leaving six dead and 16 injured",
+  "timestamp": "2026-04-20T10:54:27.886379+00:00",
+  "top_tweets": []
+}

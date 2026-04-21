@@ -1,0 +1,11 @@
+{
+  "alert_id": "23b52a67",
+  "level": "HIGH",
+  "crisis_probability": 0.5664,
+  "bert_score": 0.9762,
+  "lstm_score": 0.5,
+  "lda_score": 0.1898,
+  "trigger_text": "hausa youths set area office of apapa iganmu local council development area ablaze okada riders stormed the lg area office",
+  "timestamp": "2026-04-20T10:54:27.886285+00:00",
+  "top_tweets": []
+}

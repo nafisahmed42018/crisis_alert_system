@@ -1,0 +1,11 @@
+{
+  "alert_id": "9beee3ab",
+  "level": "CRITICAL",
+  "crisis_probability": 0.6265,
+  "bert_score": 0.9953,
+  "lstm_score": 0.5,
+  "lda_score": 0.1419,
+  "trigger_text": "rt globalwarning 97 of academic science papers agree humans are causing climate change",
+  "timestamp": "2026-04-19T22:22:40.787708+00:00",
+  "top_tweets": []
+}

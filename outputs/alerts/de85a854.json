@@ -1,0 +1,11 @@
+{
+  "alert_id": "de85a854",
+  "level": "HIGH",
+  "crisis_probability": 0.6043,
+  "bert_score": 0.9734,
+  "lstm_score": 0.5,
+  "lda_score": 0.0746,
+  "trigger_text": "sting in the tail as storm brendan hits oban",
+  "timestamp": "2026-04-20T00:34:21.178336+00:00",
+  "top_tweets": []
+}

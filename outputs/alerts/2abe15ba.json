@@ -1,0 +1,11 @@
+{
+  "alert_id": "2abe15ba",
+  "level": "HIGH",
+  "crisis_probability": 0.6036,
+  "bert_score": 0.9797,
+  "lstm_score": 0.5,
+  "lda_score": 0.0588,
+  "trigger_text": "attention uaenas maaenas we will be having an outreach program for the evacuees and victims of the natural disaster taal v",
+  "timestamp": "2026-04-20T10:37:30.054486+00:00",
+  "top_tweets": []
+}

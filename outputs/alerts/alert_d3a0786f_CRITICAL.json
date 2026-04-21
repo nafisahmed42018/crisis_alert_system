@@ -1,0 +1,11 @@
+{
+  "alert_id": "d3a0786f",
+  "level": "CRITICAL",
+  "crisis_probability": 0.6594,
+  "bert_score": 0.9909,
+  "lstm_score": 0.5,
+  "lda_score": 0.3155,
+  "trigger_text": "madhya pradesh train derailment: village youth saved many lives: a group of villagers saved over 70 passengers' lives after two train...",
+  "timestamp": "2026-04-19T10:11:35.850865+00:00",
+  "top_tweets": []
+}
