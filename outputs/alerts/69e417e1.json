@@ -1,0 +1,11 @@
+{
+  "alert_id": "69e417e1",
+  "level": "HIGH",
+  "crisis_probability": 0.5619,
+  "bert_score": 0.9956,
+  "lstm_score": 0.5,
+  "lda_score": 0.1591,
+  "trigger_text": "emergency services called to a collision on the m20 near maidstone read more on this uk news",
+  "timestamp": "2026-04-21T14:38:15.217446+00:00",
+  "top_tweets": []
+}

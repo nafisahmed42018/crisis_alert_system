@@ -1,0 +1,11 @@
+{
+  "alert_id": "48ff6d8e",
+  "level": "HIGH",
+  "crisis_probability": 0.5662,
+  "bert_score": 0.9877,
+  "lstm_score": 0.5,
+  "lda_score": 0.1777,
+  "trigger_text": "fortunately bella was saved but they re trying to get the maximum sentence for those who tried to kill her petit",
+  "timestamp": "2026-04-21T14:33:18.444548+00:00",
+  "top_tweets": []
+}

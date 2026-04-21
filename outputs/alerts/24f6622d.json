@@ -1,0 +1,11 @@
+{
+  "alert_id": "24f6622d",
+  "level": "HIGH",
+  "crisis_probability": 0.5528,
+  "bert_score": 0.9937,
+  "lstm_score": 0.5,
+  "lda_score": 0.1383,
+  "trigger_text": "494 on account of the snowstorm all the trains on the line ceased running at four o clock",
+  "timestamp": "2026-04-21T14:33:18.444650+00:00",
+  "top_tweets": []
+}
