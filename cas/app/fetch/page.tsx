@@ -1,20 +1,21 @@
-"use client";
-import { useState } from "react";
-import { api } from "@/lib/api";
-import { FetchResponse } from "@/lib/types";
-import { TweetCard } from "@/components/TweetCard";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
+"use client"
+import { useState } from "react"
+import { api } from "@/lib/api"
+import { FetchResponse } from "@/lib/types"
+import { TweetCard } from "@/components/TweetCard"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Badge } from "@/components/ui/badge"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Radio, Plus, X, Loader2, Wifi, WifiOff } from "lucide-react";
+} from "@/components/ui/select"
+import { TweetCardSkeleton } from "@/components/TweetCardSkeleton"
+import { Radio, Plus, X, Loader2, Wifi, WifiOff } from "lucide-react"
 
 const PRESET_KEYWORDS = [
   ["wildfire", "evacuation", "emergency"],
@@ -22,37 +23,38 @@ const PRESET_KEYWORDS = [
   ["flood warning", "river levels"],
   ["earthquake", "tsunami warning"],
   ["chemical leak", "hazmat"],
-];
+]
 
 export default function FetchPage() {
-  const [keywords, setKeywords]     = useState<string[]>(["wildfire", "evacuation"]);
-  const [input, setInput]           = useState("");
-  const [maxResults, setMaxResults] = useState("20");
-  const [response, setResponse]     = useState<FetchResponse | null>(null);
-  const [loading, setLoading]       = useState(false);
-  const [error, setError]           = useState("");
+  const [keywords, setKeywords] = useState<string[]>(["wildfire", "evacuation"])
+  const [input, setInput] = useState("")
+  const [maxResults, setMaxResults] = useState("20")
+  const [response, setResponse] = useState<FetchResponse | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
 
   const addKeyword = () => {
-    const kw = input.trim();
-    if (kw && !keywords.includes(kw)) setKeywords([...keywords, kw]);
-    setInput("");
-  };
+    const kw = input.trim()
+    if (kw && !keywords.includes(kw)) setKeywords([...keywords, kw])
+    setInput("")
+  }
 
-  const removeKeyword = (kw: string) => setKeywords(keywords.filter((k) => k !== kw));
+  const removeKeyword = (kw: string) =>
+    setKeywords(keywords.filter((k) => k !== kw))
 
   const run = async () => {
-    if (keywords.length === 0) return;
-    setLoading(true);
-    setError("");
+    if (keywords.length === 0) return
+    setLoading(true)
+    setError("")
     try {
-      const r = await api.fetchAndAnalyze(keywords, Number(maxResults));
-      setResponse(r);
+      const r = await api.fetchAndAnalyze(keywords, Number(maxResults))
+      setResponse(r)
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : "Failed to reach backend.");
+      setError(e instanceof Error ? e.message : "Failed to reach backend.")
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return (
     <div className="space-y-6">
@@ -61,14 +63,14 @@ export default function FetchPage() {
           <Radio size={22} className="text-sky-500" /> Fetch from 𝕏 Platform
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Enter trigger keywords to pull recent tweets from X and score them through the ensemble.
-          
+          Enter trigger keywords to pull recent tweets from X and score them
+          through the ensemble.
         </p>
       </div>
 
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          <CardTitle className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
             Active Keywords
           </CardTitle>
         </CardHeader>
@@ -79,16 +81,21 @@ export default function FetchPage() {
               <Badge
                 key={kw}
                 variant="secondary"
-                className="gap-1 pl-3 pr-2 py-1 text-sm"
+                className="gap-1 py-1 pr-2 pl-3 text-sm"
               >
                 {kw}
-                <button onClick={() => removeKeyword(kw)} className="hover:text-destructive transition-colors">
+                <button
+                  onClick={() => removeKeyword(kw)}
+                  className="transition-colors hover:text-destructive"
+                >
                   <X size={12} />
                 </button>
               </Badge>
             ))}
             {keywords.length === 0 && (
-              <span className="text-xs text-muted-foreground">Add at least one keyword…</span>
+              <span className="text-xs text-muted-foreground">
+                Add at least one keyword…
+              </span>
             )}
           </div>
 
@@ -108,7 +115,9 @@ export default function FetchPage() {
 
           {/* Presets */}
           <div>
-            <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Presets</div>
+            <div className="mb-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+              Presets
+            </div>
             <div className="flex flex-wrap gap-2">
               {PRESET_KEYWORDS.map((preset) => (
                 <Button
@@ -127,14 +136,18 @@ export default function FetchPage() {
           {/* Controls */}
           <div className="flex items-end gap-4">
             <div className="space-y-1">
-              <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Max Results</div>
+              <div className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+                Max Results
+              </div>
               <Select value={maxResults} onValueChange={setMaxResults}>
                 <SelectTrigger className="w-36">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   {[10, 20, 50, 100].map((n) => (
-                    <SelectItem key={n} value={String(n)}>{n} tweets</SelectItem>
+                    <SelectItem key={n} value={String(n)}>
+                      {n} tweets
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -143,9 +156,13 @@ export default function FetchPage() {
             <Button
               onClick={run}
               disabled={loading || keywords.length === 0}
-              className="gap-2 bg-sky-600 hover:bg-sky-700 text-white"
+              className="gap-2 bg-sky-600 text-white hover:bg-sky-700"
             >
-              {loading ? <Loader2 size={15} className="animate-spin" /> : <Radio size={15} />}
+              {loading ? (
+                <Loader2 size={15} className="animate-spin" />
+              ) : (
+                <Radio size={15} />
+              )}
               {loading ? "Fetching…" : "Fetch & Analyze"}
             </Button>
           </div>
@@ -154,20 +171,34 @@ export default function FetchPage() {
         </CardContent>
       </Card>
 
+      {/* Skeleton loading */}
+      {loading && (
+        <div className="space-y-3">
+          {Array.from({
+            length: Number(maxResults) > 5 ? 5 : Number(maxResults),
+          }).map((_, i) => (
+            <TweetCardSkeleton key={i} />
+          ))}
+        </div>
+      )}
+
       {/* Results */}
-      {response && (
+      {!loading && response && (
         <div className="space-y-4">
           <div className="flex items-center gap-3">
             {response.x_api_live ? (
-              <Badge className="gap-1.5 bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-300">
-                <Wifi size={13} /> Live from 𝕏 — {response.fetched} tweets fetched
+              <Badge className="gap-1.5 border-green-200 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300">
+                <Wifi size={13} /> Live from 𝕏 — {response.fetched} tweets
+                fetched
               </Badge>
             ) : (
               <Badge variant="secondary" className="gap-1.5">
                 <WifiOff size={13} /> Demo mode (no X_BEARER_TOKEN configured)
               </Badge>
             )}
-            <span className="text-sm text-muted-foreground">{response.results.length} scored</span>
+            <span className="text-sm text-muted-foreground">
+              {response.results.length} scored
+            </span>
           </div>
 
           <div className="space-y-3">
@@ -178,5 +209,5 @@ export default function FetchPage() {
         </div>
       )}
     </div>
-  );
+  )
 }

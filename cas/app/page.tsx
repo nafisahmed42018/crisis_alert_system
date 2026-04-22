@@ -1,72 +1,107 @@
-"use client";
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import { api } from "@/lib/api";
-import { ScoreResult, AlertLevel } from "@/lib/types";
-import { AlertBadge } from "@/components/AlertBadge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TrendingUp, Search, Radio, AlertTriangle } from "lucide-react";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
+"use client"
+import { useEffect, useState } from "react"
+import Link from "next/link"
+import { api } from "@/lib/api"
+import { ScoreResult, AlertLevel } from "@/lib/types"
+import { AlertBadge } from "@/components/AlertBadge"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { TrendingUp, Search, Radio, AlertTriangle } from "lucide-react"
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  Cell,
+} from "recharts"
 
 const LEVEL_COLORS: Record<AlertLevel, string> = {
-  LOW:      "#6b7280",
-  MEDIUM:   "#f59e0b",
-  HIGH:     "#f97316",
+  LOW: "#6b7280",
+  MEDIUM: "#f59e0b",
+  HIGH: "#f97316",
   CRITICAL: "#dc2626",
-};
+}
 
 export default function DashboardPage() {
-  const [alerts, setAlerts] = useState<ScoreResult[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [alerts, setAlerts] = useState<ScoreResult[]>([])
+  const [loading, setLoading] = useState(true)
 
   const fetchAlerts = async () => {
     try {
-      const data = await api.getAlerts(undefined, 100);
-      setAlerts(data);
+      const data = await api.getAlerts(undefined, 100)
+      setAlerts(data)
     } catch {
       /* backend not yet started */
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   useEffect(() => {
-    fetchAlerts();
-    const id = setInterval(fetchAlerts, 10_000);
-    return () => clearInterval(id);
-  }, []);
+    fetchAlerts()
+    const id = setInterval(fetchAlerts, 10_000)
+    return () => clearInterval(id)
+  }, [])
 
-  const counts = (["CRITICAL", "HIGH", "MEDIUM", "LOW"] as AlertLevel[]).map((lvl) => ({
-    level: lvl,
-    count: alerts.filter((a) => a.alert_level === lvl).length,
-  }));
+  const counts = (["CRITICAL", "HIGH", "MEDIUM", "LOW"] as AlertLevel[]).map(
+    (lvl) => ({
+      level: lvl,
+      count: alerts.filter((a) => a.alert_level === lvl).length,
+    })
+  )
 
   const avgProb = alerts.length
-    ? (alerts.reduce((s, a) => s + a.crisis_probability, 0) / alerts.length).toFixed(3)
-    : "—";
+    ? (
+        alerts.reduce((s, a) => s + a.crisis_probability, 0) / alerts.length
+      ).toFixed(3)
+    : "—"
 
-  const recent = [...alerts].slice(0, 8);
+  const recent = [...alerts].slice(0, 8)
 
   return (
     <div className="space-y-8">
       <div>
         <h1 className="text-2xl font-bold">Crisis Alert Dashboard</h1>
-        
       </div>
 
       {/* KPI strip */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-5">
         {[
-          { label: "Total Alerts",    value: alerts.length, className: "text-foreground" },
-          { label: "CRITICAL",          value: counts[0].count, className: "text-destructive" },
-          { label: "HIGH",             value: counts[1].count, className: "text-orange-500" },
-          { label: "MEDIUM",           value: counts[2].count, className: "text-yellow-500" },
-          { label: "Avg Probability", value: avgProb,         className: "text-foreground" },
+          {
+            label: "Total Alerts",
+            value: alerts.length,
+            className: "text-foreground",
+          },
+          {
+            label: "CRITICAL",
+            value: counts[0].count,
+            className: "text-destructive",
+          },
+          {
+            label: "HIGH",
+            value: counts[1].count,
+            className: "text-orange-500",
+          },
+          {
+            label: "MEDIUM",
+            value: counts[2].count,
+            className: "text-yellow-500",
+          },
+          {
+            label: "Avg Probability",
+            value: avgProb,
+            className: "text-foreground",
+          },
         ].map((k) => (
           <Card key={k.label} size="sm">
             <CardContent className="pt-3 pb-3 text-center">
-              <div className="text-xs text-muted-foreground mb-1">{k.label}</div>
-              <div className={`text-2xl font-bold ${k.className}`}>{k.value}</div>
+              <div className="mb-1 text-xs text-muted-foreground">
+                {k.label}
+              </div>
+              <div className={`text-2xl font-bold ${k.className}`}>
+                {k.value}
+              </div>
             </CardContent>
           </Card>
         ))}
@@ -76,7 +111,9 @@ export default function DashboardPage() {
         {/* Alert distribution chart */}
         <Card>
           <CardHeader className="pb-0">
-            <CardTitle className="text-sm font-semibold text-muted-foreground">Alert Level Distribution</CardTitle>
+            <CardTitle className="text-sm font-semibold text-muted-foreground">
+              Alert Level Distribution
+            </CardTitle>
           </CardHeader>
           <CardContent>
             {alerts.length === 0 ? (
@@ -84,7 +121,7 @@ export default function DashboardPage() {
                 No alerts yet — analyze some tweets to see results.
               </div>
             ) : (
-              <ResponsiveContainer width="100%" height={180}>
+              <ResponsiveContainer width="100%" height={160}>
                 <BarChart data={counts} margin={{ top: 4, bottom: 4 }}>
                   <XAxis dataKey="level" tick={{ fontSize: 12 }} />
                   <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
@@ -127,8 +164,10 @@ export default function DashboardPage() {
                 <CardContent className="flex items-start gap-3 pt-4 pb-4">
                   <div className="mt-0.5">{c.icon}</div>
                   <div>
-                    <div className="font-semibold text-sm">{c.title}</div>
-                    <div className="text-xs text-muted-foreground mt-0.5">{c.desc}</div>
+                    <div className="text-sm font-semibold">{c.title}</div>
+                    <div className="mt-0.5 text-xs text-muted-foreground">
+                      {c.desc}
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -141,10 +180,13 @@ export default function DashboardPage() {
       {recent.length > 0 && (
         <div>
           <div className="mb-3 flex items-center justify-between">
-            <h2 className="flex items-center gap-2 font-semibold text-sm text-muted-foreground">
+            <h2 className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
               <TrendingUp size={16} /> Recent Alerts
             </h2>
-            <Link href="/alerts" className="text-sm text-primary hover:underline">
+            <Link
+              href="/alerts"
+              className="text-sm text-primary hover:underline"
+            >
               View all →
             </Link>
           </div>
@@ -152,7 +194,10 @@ export default function DashboardPage() {
             {recent.map((a) => (
               <Card key={a.id} size="sm">
                 <CardContent className="flex items-center gap-3 py-3">
-                  <AlertBadge level={a.alert_level} prob={a.crisis_probability} />
+                  <AlertBadge
+                    level={a.alert_level}
+                    prob={a.crisis_probability}
+                  />
                   <p className="flex-1 truncate text-sm">{a.text}</p>
                   <span className="shrink-0 text-xs text-muted-foreground">
                     {a.crisis_type.replace(/_/g, " ")}
@@ -170,5 +215,5 @@ export default function DashboardPage() {
         </div>
       )}
     </div>
-  );
+  )
 }
