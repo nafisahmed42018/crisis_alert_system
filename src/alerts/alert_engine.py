@@ -3,8 +3,10 @@
 Usage
 -----
     from src.alerts.alert_engine import AlertEngine
-    engine  = AlertEngine()
-    alerts  = engine.process(results_df)
+    from src.alerts.slack_notifier import SlackNotifier
+
+    engine = AlertEngine(notifier=SlackNotifier())   # Slack on by default (HIGH+)
+    alerts = engine.process(results_df)
     for alert in alerts:
         print(alert.to_json())
         engine.save(alert, "outputs/alerts/")
@@ -13,7 +15,7 @@ Usage
 import json
 import os
 import uuid
-from typing import List
+from typing import List, Optional
 
 import pandas as pd
 
@@ -21,10 +23,11 @@ from src.alerts.alert_schema import CrisisAlert, ALERT_LEVELS
 
 
 class AlertEngine:
-    def __init__(self, min_level: str = "MEDIUM"):
+    def __init__(self, min_level: str = "MEDIUM", notifier=None):
         """Only emit alerts at or above min_level."""
         assert min_level in ALERT_LEVELS
         self._min_idx = ALERT_LEVELS.index(min_level)
+        self._notifier = notifier  # SlackNotifier instance or None
 
     # ------------------------------------------------------------------
     # Public API
@@ -53,6 +56,8 @@ class AlertEngine:
                 trigger_text=row["text"][:280],
             )
             alerts.append(alert)
+            if self._notifier:
+                self._notifier.send(alert)
 
         return alerts
 
@@ -66,7 +71,7 @@ class AlertEngine:
                 .nlargest(5, "crisis_probability")["text"]
                 .tolist())
 
-        return CrisisAlert(
+        alert = CrisisAlert(
             alert_id=str(uuid.uuid4())[:8],
             level=worst["alert_level"],
             crisis_probability=worst["crisis_probability"],
@@ -76,6 +81,9 @@ class AlertEngine:
             trigger_text=worst["text"][:280],
             top_tweets=top5,
         )
+        if self._notifier:
+            self._notifier.send(alert)
+        return alert
 
     def save(self, alert: CrisisAlert, output_dir: str = "outputs/alerts/") -> str:
         os.makedirs(output_dir, exist_ok=True)

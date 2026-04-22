@@ -27,8 +27,8 @@ W_LSTM = 0.20
 W_LDA = 0.40
 
 # Alert thresholds (full pipeline — all 3 models active with real timestamps)
-THRESHOLD_CRITICAL = 0.85
-THRESHOLD_HIGH = 0.70
+THRESHOLD_CRITICAL = 0.80
+THRESHOLD_HIGH = 0.65
 THRESHOLD_MEDIUM = 0.50
 
 # Demo thresholds — used when LSTM is neutral (no timestamps available)

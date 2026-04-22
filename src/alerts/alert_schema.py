@@ -18,16 +18,18 @@ LEVEL_COLORS = {
 
 @dataclass
 class CrisisAlert:
-    alert_id:          str
-    level:             str
-    crisis_probability: float
-    bert_score:        float
-    lstm_score:        float
-    lda_score:         float
-    trigger_text:      str
-    timestamp:         str = field(
-        default_factory=lambda: datetime.now(timezone.utc).isoformat())
-    top_tweets:        List[str] = field(default_factory=list)
+    alert_id:            str
+    level:               str
+    crisis_probability:  float
+    bert_score:          float
+    lstm_score:          float
+    lda_score:           float
+    trigger_text:        str
+    timestamp:           str       = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    top_tweets:          List[str] = field(default_factory=list)
+    recommended_actions: List[str] = field(default_factory=list)
+    escalation_path:     List[str] = field(default_factory=list)
+    escalation_timing:   str       = ""
 
     def to_dict(self) -> dict:
         return asdict(self)

@@ -62,8 +62,7 @@ export default function FetchPage() {
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Enter trigger keywords to pull recent tweets from X and score them through the ensemble.
-          Requires an <code className="rounded bg-muted px-1 text-xs">X_BEARER_TOKEN</code> in{" "}
-          <code className="rounded bg-muted px-1 text-xs">.env</code>; falls back to demo mode without one.
+          
         </p>
       </div>
 

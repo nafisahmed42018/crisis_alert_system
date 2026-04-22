@@ -7,6 +7,8 @@ Run from project root:
 from __future__ import annotations
 from src.api.x_client import search_recent, RawTweet
 from src.api.ai_recommendation import build_recommendation_ai
+from src.alerts.slack_notifier import SlackNotifier
+from src.alerts.alert_schema import CrisisAlert
 from src.alerts.alert_engine import AlertEngine
 from src.models.ensemble import CrisisEnsemble
 from pydantic import BaseModel
@@ -44,6 +46,7 @@ app.add_middleware(
 
 _ensemble: Optional[CrisisEnsemble] = None
 _alert_engine = AlertEngine(min_level="LOW")
+_slack = SlackNotifier(min_level="HIGH")
 
 
 def get_ensemble() -> CrisisEnsemble:
@@ -167,6 +170,18 @@ async def _score_texts(
         )
         results.append(record)
         _store_alert(record.model_dump())
+        _slack.send(CrisisAlert(
+            alert_id=record.id[:8],
+            level=record.alert_level,
+            crisis_probability=record.crisis_probability,
+            bert_score=record.bert_score,
+            lstm_score=record.lstm_score,
+            lda_score=record.lda_score,
+            trigger_text=record.text,
+            recommended_actions=record.recommended_actions,
+            escalation_path=record.escalation_path,
+            escalation_timing=record.escalation_timing,
+        ))
 
     return results
 

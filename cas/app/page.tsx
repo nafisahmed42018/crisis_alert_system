@@ -51,9 +51,7 @@ export default function DashboardPage() {
     <div className="space-y-8">
       <div>
         <h1 className="text-2xl font-bold">Crisis Alert Dashboard</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Real-time social media monitoring — BERT (40%) + LSTM (40%) + LDA (20%)
-        </p>
+        
       </div>
 
       {/* KPI strip */}

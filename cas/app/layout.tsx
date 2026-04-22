@@ -26,8 +26,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <header className="sticky top-0 z-50 border-b bg-background/80 backdrop-blur">
             <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
               <Link href="/" className="flex items-center gap-2 font-bold text-foreground">
-                <AlertTriangle size={20} className="text-destructive" />
-                Crisis Alert System
+                C.A.S
               </Link>
               <nav className="flex items-center gap-6 text-sm font-medium text-muted-foreground">
                 <Link href="/" className="hover:text-foreground transition-colors">Dashboard</Link>
