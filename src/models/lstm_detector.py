@@ -294,7 +294,8 @@ class LSTMDetector:
 
             if val_loss < best_val_loss:
                 best_val_loss = val_loss
-                best_state = {k: v.clone()
+                # store on CPU to free GPU memory during training
+                best_state = {k: v.clone().cpu()
                               for k, v in self.model.state_dict().items()}
                 patience_counter = 0
             else:
@@ -311,17 +312,22 @@ class LSTMDetector:
     # Inference
     # ------------------------------------------------------------------
 
-    def predict_timeseries(self, ts: pd.DataFrame) -> pd.Series:
+    def predict_timeseries(self, ts: pd.DataFrame, batch_size: int = 4096) -> pd.Series:
         """Return crisis score per hour bucket as a Series indexed by hour."""
         X_raw, _ = self._make_windows(ts, require_label=False)
         X_scaled = self._scale(X_raw)
 
-        device = next(self.model.parameters()).device
-        self.model.eval()
+        # Run inference on CPU to avoid GPU OOM after training
+        cpu_model = self.model.cpu()
+        cpu_model.eval()
+        all_scores = []
         with torch.no_grad():
-            scores = self.model(
-                torch.tensor(X_scaled, dtype=torch.float32).to(device)
-            ).cpu().numpy()
+            for start in range(0, len(X_scaled), batch_size):
+                batch = torch.tensor(
+                    X_scaled[start:start + batch_size], dtype=torch.float32
+                )
+                all_scores.append(cpu_model(batch).numpy())
+        scores = np.concatenate(all_scores)
 
         hours = pd.to_datetime(ts["hour"], utc=True).iloc[self.window:]
         self._hour_scores = pd.Series(scores, index=hours)

@@ -32,7 +32,7 @@ THRESHOLD_HIGH = 0.65
 THRESHOLD_MEDIUM = 0.50
 
 # Demo thresholds — used when LSTM is neutral (no timestamps available)
-# Max possible score when LSTM=0.5: 0.4*BERT + 0.2 + 0.2*LDA ≈ 0.64
+# Max possible score when LSTM=0.5: 0.4*BERT + 0.1 + 0.4*LDA ≈ 0.90
 THRESHOLD_CRITICAL_DEMO = 0.62
 THRESHOLD_HIGH_DEMO = 0.55
 THRESHOLD_MEDIUM_DEMO = 0.45

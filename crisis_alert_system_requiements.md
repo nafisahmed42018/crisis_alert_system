@@ -394,7 +394,7 @@ class CrisisTopicAnalyzer:
 │  LSTM Signal (Anomaly + Velocity)  ──┼─→ Ensemble Vote    │
 │  LDA Signal (Topic + Root Cause)  ───┘    (Weighted Sum)   │
 │                                                               │
-│  Crisis Probability = 0.4×BERT + 0.4×LSTM + 0.2×LDA        │
+│  Crisis Probability = 0.4×BERT + 0.2×LSTM + 0.4×LDA        │
 │                                                               │
 │  IF Crisis Probability > 0.7 → ALERT                        │
 │  IF Crisis Probability > 0.85 → CRITICAL ALERT              │

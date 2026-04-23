@@ -2,23 +2,23 @@
 # Install with: pip install -r requirements.txt
 
 # Core ML
-transformers==4.40.0
-torch==2.3.0
-tensorflow==2.16.1
-scikit-learn==1.4.2
-gensim==4.3.2
+transformers==4.45.0
+torch==2.5.0
+tensorflow==2.20.0
+scikit-learn==1.5.2
+gensim==4.4.0
 
 # Data Processing
-pandas==2.2.2
-numpy==1.26.4
+pandas==2.3.0
+numpy>=1.26.0
 nltk==3.8.1
 emoji==2.12.1
 python-dotenv==1.0.1
 
 # Visualization & Dashboard
-streamlit==1.35.0
+streamlit==1.36.0
 plotly==5.22.0
-matplotlib==3.9.0
+matplotlib==3.10.0
 seaborn==0.13.2
 
 # Utilities

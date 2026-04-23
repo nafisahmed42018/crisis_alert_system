@@ -91,8 +91,8 @@ with st.sidebar:
     st.markdown("**Pipeline**")
     st.markdown("""
 - 🔵 **BERT** — Crisis intent (40%)
-- 🟢 **LSTM** — Temporal anomaly (40%)
-- 🟣 **LDA** — Topic shift (20%)
+- 🟢 **LSTM** — Temporal anomaly (20%)
+- 🟣 **LDA** — Topic shift (40%)
 """)
     st.divider()
 
@@ -272,8 +272,8 @@ with tab3:
         col_a, col_b, col_c = st.columns(3)
         for col, score_col, name, color in [
             (col_a, "bert_score",  "BERT (40%)",  "#e63946"),
-            (col_b, "lstm_score",  "LSTM (40%)",  "#457b9d"),
-            (col_c, "lda_score",   "LDA (20%)",   "#2a9d8f"),
+            (col_b, "lstm_score",  "LSTM (20%)",  "#457b9d"),
+            (col_c, "lda_score",   "LDA (40%)",   "#2a9d8f"),
         ]:
             fig = go.Figure()
             for lbl, c in [(0, "#adb5bd"), (1, color)]:
@@ -346,13 +346,13 @@ Detects social media crises using an ensemble of three ML models:
 | Model | Architecture | Dataset | Weight |
 |---|---|---|---|
 | **BERT** | DistilBERT fine-tuned | Disaster Tweets (7.6K) | 40% |
-| **LSTM** | 2-layer LSTM, hidden=64 | Climate Twitter (15.8M) | 40% |
-| **LDA** | Gensim LDA, k=5 topics | Disaster Tweets (7.6K) | 20% |
+| **LSTM** | 2-layer LSTM, hidden=64 | Climate Twitter (15.8M) | 20% |
+| **LDA** | Gensim LDA, k=5 topics | Disaster Tweets (7.6K) | 40% |
 
 ### Ensemble Formula
 
 ```
-crisis_probability = 0.40 × BERT + 0.40 × LSTM + 0.20 × LDA
+crisis_probability = 0.40 × BERT + 0.20 × LSTM + 0.40 × LDA
 ```
 
 ### Alert Levels

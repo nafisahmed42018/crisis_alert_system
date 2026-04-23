@@ -63,7 +63,7 @@ def gauge_chart(prob: float, level: str) -> go.Figure:
 
 def score_bar_chart(bert: float, lstm: float, lda: float) -> go.Figure:
     """Horizontal bar chart showing individual model scores."""
-    models = ["LDA (20%)", "LSTM (40%)", "BERT (40%)"]
+    models = ["LDA (40%)", "LSTM (20%)", "BERT (40%)"]
     scores = [lda, lstm, bert]
     colors = ["#2a9d8f", "#457b9d", "#e63946"]
 

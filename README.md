@@ -12,11 +12,11 @@ Detects crises in social media using an ensemble of three complementary ML model
 | Model | Architecture | Dataset | Weight |
 |---|---|---|---|
 | **BERT** | DistilBERT fine-tuned | Kaggle Disaster Tweets (7.6K) | 40% |
-| **LSTM** | 2-layer LSTM, hidden=64 | Climate Change Twitter (15.8M) | 40% |
-| **LDA** | Gensim LDA, k=5 topics | Kaggle Disaster Tweets (7.6K) | 20% |
+| **LSTM** | 2-layer LSTM, hidden=64 | Climate Change Twitter (15.8M) | 20% |
+| **LDA** | Gensim LDA, k=5 topics | Kaggle Disaster Tweets (7.6K) | 40% |
 
 ```
-crisis_probability = 0.40 × BERT + 0.40 × LSTM + 0.20 × LDA
+crisis_probability = 0.40 × BERT + 0.20 × LSTM + 0.40 × LDA
 ```
 
 ---
@@ -110,7 +110,7 @@ streamlit run src/dashboard/app.py
 | BERT | ~0.910 | DistilBERT, fine-tuned 3 epochs |
 | LSTM | 0.856 | Trained on Climate Twitter time series |
 | LDA | 0.605 | k=5 topics, crisis topics [1,2,3] |
-| **Ensemble** | **0.926** | Weighted: 40% BERT + 40% LSTM + 20% LDA |
+| **Ensemble** | **0.926** | Weighted: 40% BERT + 20% LSTM + 40% LDA |
 
 **Ensemble Accuracy**: 88% on Disaster Tweets test set  
 **Alerts on full dataset**: 2,645 HIGH+CRITICAL alerts out of 7,613 tweets
@@ -136,13 +136,13 @@ streamlit run src/dashboard/app.py
 - Input: raw tweet text (max 128 tokens)
 - Output: crisis probability in [0, 1]
 
-### LSTM (40%)
+### LSTM (20%)
 - Trained on 116,726 hourly windows from Climate Change Twitter (2006–2019)
 - Labeling: `crisis = negative_sentiment + high_volume`
 - Input: sliding 24-hour window of [mean_sentiment, tweet_volume, pct_negative, pct_aggressive, pct_weather]
 - Output: hourly crisis probability; mapped to tweets via timestamp lookup
 
-### LDA (20%)
+### LDA (40%)
 - k=5 topics discovered via coherence-optimised Gensim LDA
 - Crisis topics identified by correlation with disaster labels
 - Output: fraction of token weight in crisis topics
