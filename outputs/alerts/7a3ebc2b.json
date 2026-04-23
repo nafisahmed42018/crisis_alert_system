@@ -1,0 +1,14 @@
+{
+  "alert_id": "7a3ebc2b",
+  "level": "HIGH",
+  "crisis_probability": 0.5672,
+  "bert_score": 0.9841,
+  "lstm_score": 0.5,
+  "lda_score": 0.184,
+  "trigger_text": "logan county family reunited with dog after their home was destroyed during tornado via",
+  "timestamp": "2026-04-23T16:24:12.543250+00:00",
+  "top_tweets": [],
+  "recommended_actions": [],
+  "escalation_path": [],
+  "escalation_timing": ""
+}

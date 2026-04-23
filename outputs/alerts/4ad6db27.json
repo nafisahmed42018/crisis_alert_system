@@ -1,0 +1,14 @@
+{
+  "alert_id": "4ad6db27",
+  "level": "HIGH",
+  "crisis_probability": 0.5503,
+  "bert_score": 0.98,
+  "lstm_score": 0.5,
+  "lda_score": 0.1458,
+  "trigger_text": "it s pandemonium in nola",
+  "timestamp": "2026-04-23T16:24:12.543137+00:00",
+  "top_tweets": [],
+  "recommended_actions": [],
+  "escalation_path": [],
+  "escalation_timing": ""
+}

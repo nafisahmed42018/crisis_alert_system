@@ -52,7 +52,7 @@ df_bal = pd.concat([
     normal.sample(n, random_state=42),
 ]).sample(frac=1, random_state=42).reset_index(drop=True)
 
-df_bal.to_csv("data/processed/tweets_clean.csv", index=False)
+df_bal.to_csv("./data/processed/tweets_clean.csv", index=False)
 print(f"\nBalanced: {len(df_bal):,} rows  ({df_bal['label'].mean():.1%} crisis)")
 print("Saved -> data/processed/tweets_clean.csv")
 

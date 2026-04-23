@@ -1,0 +1,14 @@
+{
+  "alert_id": "d0350537",
+  "level": "HIGH",
+  "crisis_probability": 0.5689,
+  "bert_score": 0.9882,
+  "lstm_score": 0.5,
+  "lda_score": 0.184,
+  "trigger_text": "sinkhole swallows bus and passengers killing at least 6",
+  "timestamp": "2026-04-23T16:24:12.543274+00:00",
+  "top_tweets": [],
+  "recommended_actions": [],
+  "escalation_path": [],
+  "escalation_timing": ""
+}
